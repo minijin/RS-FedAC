@@ -1,0 +1,109 @@
+---
+datasets:
+  lp_default: &lp_dataset_default
+    task: "link_prediction"
+  
+
+  ACM:
+    <<: *lp_dataset_default
+    cname: "acm-hetero"
+    path: "./data/acm-hetero"
+    user_ntype: "author"
+    item_ntype: "paper"
+    interaction_etype: "writes"
+    neg_samples_eval: 99
+    attr_completion:
+      author:
+        - hop1_etype: "writes"     
+          hop2_etype: "belongsto"
+          feat_ntype: "subject"
+        - hop1_etype: "writes"     
+          hop2_etype: "writtenby"
+          feat_ntype: "author"
+
+
+
+models:
+  default: &model_default
+    hidden_dim: 64
+    neg_sample_size: 1
+    margin: 1.0
+    batch_size: 10000000
+    optim: "SGD"
+    lr: 0.01
+    weight_decay: 0.0
+    val_interval: 5
+    patience: 20
+    scorer: "dot"
+
+  RGCN: &RGCN
+    <<: *model_default
+    num_layers: 2
+    dropout: 0.0
+  RGCN_lp:
+    <<: *RGCN
+    lr: 0.01
+    use_self_loop: True
+    neg_sample_size: 4
+    scorer: "dot"
+    batch_size: 2048
+    num_layers: 3
+  RGCN_lp_feat:
+    <<: *RGCN
+    lr: 0.01
+    use_self_loop: True
+    neg_sample_size: 4
+    scorer: "dot"
+    batch_size: 2048
+
+
+  RGCN_lp_feat_ACM:
+    <<: *RGCN
+    optim: "Adam"
+    lr: 0.001
+    weight_decay: 0.0005
+    use_self_loop: True
+    neg_sample_size: 4
+    scorer: "dot"
+    batch_size: 2048
+    dropout: 0.1
+    rec_loss_weight: 0.15
+    patience: 20
+    val_interval: 5
+
+
+  
+
+frameworks:
+  fl_default: &fl_framework_default
+    num_local_epochs: 5
+    max_rounds: 1000
+    fraction: 1.0
+  FedHGN: &FedHGN
+    <<: *fl_framework_default
+    align_reg: 0.2
+  FedHGN_lp:
+    <<: *FedHGN
+    align_reg: 0.2
+    num_bases: 20
+
+
+  FedHGN_lp_ACM:
+    <<: *fl_framework_default
+    align_reg: 0.5
+    num_bases: 20
+
+  FedAvg:
+    <<: *fl_framework_default
+    num_bases: -1
+    mu: 0.0
+  FedProx:
+    <<: *fl_framework_default
+    num_bases: -1
+    mu: 1.0
+  Local:
+    max_epochs: 6000
+    num_bases: -1
+  Central:
+    max_epochs: 6000
+    num_bases: -1
