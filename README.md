@@ -8,6 +8,5 @@
 * PyYAML 6.0
 * tqdm 4.64.1
 
-  The processed ACM dataset can be obtained via the following link:
- https://pan.baidu.com/s/1Ee5a0UcWqwQ05DGkYtuWaw?pwd=sh7p 提取码: sh7p 
+  The ACM dataset can be obtained via the following link: https://github.com/RuixZh/SR-RSC
 
